@@ -10,10 +10,13 @@ import { fetchUpstream, readBounded, validRangeHeader } from "./upstream";
 
 const PROOF_CHANNEL_ID = "00sReplay.us";
 const PROOF_SOURCE_ID = "7XHFFcGQlWx6";
+const HEADER_PROOF_CHANNEL_ID = "A24.ar";
+const HEADER_PROOF_SOURCE_ID = "H9BccK2fOvww";
 const PLAYLIST_TYPES = ["application/vnd.apple.mpegurl", "application/x-mpegurl", "audio/mpegurl", "audio/x-mpegurl"];
 
 export function isGatewayProofSource(channelId: string, sourceId: string): boolean {
-  return channelId === PROOF_CHANNEL_ID && sourceId === PROOF_SOURCE_ID;
+  return (channelId === PROOF_CHANNEL_ID && sourceId === PROOF_SOURCE_ID)
+    || (channelId === HEADER_PROOF_CHANNEL_ID && sourceId === HEADER_PROOF_SOURCE_ID);
 }
 
 export function createGatewayEntryPath(channelId: string, sourceId: string): string {
@@ -21,8 +24,8 @@ export function createGatewayEntryPath(channelId: string, sourceId: string): str
   return gatewayPath(createPlaybackCapability({ channelId, sourceId, resourceKind: "root-manifest" }));
 }
 
-async function bindCapability(value: PlaybackCapability): Promise<{ upstreamUrl: string }> {
-  return { upstreamUrl: await resolveCatalogBoundResource(value, getChannelById, isGatewayProofSource) };
+async function bindCapability(value: PlaybackCapability) {
+  return resolveCatalogBoundResource(value, getChannelById, isGatewayProofSource);
 }
 
 function responseHeaders(requestOrigin: string | null): Headers {
@@ -42,10 +45,10 @@ function copyMediaHeaders(source: NodeJS.Dict<string | string[]>, target: Header
 export async function handleGatewayRequest(token: string, request: Request): Promise<GatewayResponse> {
   const startedAt = Date.now();
   const capability = verifyPlaybackCapability(token);
-  const { upstreamUrl } = await bindCapability(capability);
+  const { upstreamUrl, headerPolicy } = await bindCapability(capability);
   const range = validRangeHeader(request.headers.get("range"));
   if (request.headers.has("range") && !range) return { status: 416, body: null, headers: responseHeaders(request.headers.get("origin")) };
-  const upstream = await fetchUpstream(upstreamUrl, { range });
+  const upstream = await fetchUpstream(upstreamUrl, { range, headerPolicy });
   const status = upstream.response.statusCode ?? 502;
   if (status < 200 || status >= 300) { upstream.response.resume(); throw new Error(`Upstream rejected resource (${status})`); }
   const headers = responseHeaders(request.headers.get("origin"));
