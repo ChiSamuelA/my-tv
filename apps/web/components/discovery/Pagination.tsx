@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-interface PaginationProps { page: number; totalPages: number; hrefForPage: (page: number) => string; }
+interface PaginationProps { page: number; totalPages: number; hrefForPage: (page: number) => string; label?: string; }
 
 function visiblePages(page: number, totalPages: number): Array<number | "ellipsis"> {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -13,10 +13,10 @@ function visiblePages(page: number, totalPages: number): Array<number | "ellipsi
   return result;
 }
 
-export function Pagination({ page, totalPages, hrefForPage }: PaginationProps) {
+export function Pagination({ page, totalPages, hrefForPage, label = "Results pages" }: PaginationProps) {
   if (totalPages <= 1) return null;
   return (
-    <nav className="pagination" aria-label="Sports results pages">
+    <nav className="pagination" aria-label={label}>
       {page > 1 ? <Link className="page-button page-arrow" href={hrefForPage(page - 1)} aria-label="Previous page">{"\u2190"}</Link> : <span className="page-button page-arrow disabled" aria-hidden="true">{"\u2190"}</span>}
       {visiblePages(page, totalPages).map((value, index) => value === "ellipsis"
         ? <span className="page-ellipsis" key={`ellipsis-${index}`} aria-hidden="true">{"\u2026"}</span>
