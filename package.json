@@ -1,0 +1,20 @@
+{
+  "name": "my-tv",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.26.1",
+  "scripts": {
+    "dev": "pnpm --dir apps/web dev",
+    "build": "pnpm --dir apps/web build",
+    "lint": "pnpm --dir apps/web lint",
+    "typecheck": "tsc --noEmit -p scripts/tsconfig.json && pnpm --dir apps/web exec tsc --noEmit",
+    "data:update": "tsx scripts/data/update.ts",
+    "data:update:published": "tsx scripts/data/update.ts --published",
+    "data:validate": "tsx scripts/data/validate.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

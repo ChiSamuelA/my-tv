@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.1.0",
+  "generatedAt": "2026-08-25T14:46:19.151Z",
+  "source": {
+    "pathType": "local-checkout",
+    "configuredPath": "../iptv-mb",
+    "upstreamCommit": "83c4457ba48db3cd9d468fd4ca01e1e07e893ade",
+    "published": {
+      "baseUrl": "https://iptv-org.github.io/api",
+      "fetchedAt": "2026-08-25T14:46:17.906Z",
+      "files": [
+        {
+          "name": "channels.json",
+          "etag": "W/\"6a8cf36e-9ca51b\"",
+          "lastModified": "Tue, 25 Aug 2026 01:44:14 GMT"
+        },
+        {
+          "name": "feeds.json",
+          "etag": "W/\"6a8cf36e-78e709\"",
+          "lastModified": "Tue, 25 Aug 2026 01:44:14 GMT"
+        },
+        {
+          "name": "logos.json",
+          "etag": "W/\"6a8cf36e-6f485f\"",
+          "lastModified": "Tue, 25 Aug 2026 01:44:14 GMT"
+        },
+        {
+          "name": "streams.json",
+          "etag": "W/\"6a8cf36e-35beec\"",
+          "lastModified": "Tue, 25 Aug 2026 01:44:14 GMT"
+        },
+        {
+          "name": "guides.json",
+          "etag": "W/\"6a8cf36e-186ea98\"",
+          "lastModified": "Tue, 25 Aug 2026 01:44:14 GMT"
+        }
+      ]
+    }
+  },
+  "channelCount": 11802,
+  "streamCount": 16880,
+  "enrichment": {
+    "channelsEnriched": 9967,
+    "channelsWithoutAuthoritativeMetadata": 1835,
+    "channelsWithLogos": 9812,
+    "channelsWithCategories": 8541,
+    "channelsWithLanguages": 9967,
+    "channelsWithCountry": 11802,
+    "localStreamsMatchedByPublishedUrl": 14929
+  }
+}
