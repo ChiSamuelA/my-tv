@@ -16,12 +16,13 @@ const navigation = [["/", "Home"], ["/sports", "Sports"], ["/live", "Live TV"], 
 
 export function AppHeader() {
   const pathname = usePathname();
+  const isWatch = pathname.startsWith("/watch/");
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="app-header">
+    <header className={`app-header${isWatch ? " watch-app-header" : ""}`}>
       <Link className="wordmark" href="/">my<span>{"\u00b7"}</span>tv</Link>
-      <nav className="desktop-nav" aria-label="Primary navigation">
+      <nav className="desktop-nav" aria-label="Primary navigation" hidden={isWatch}>
         {navigation.map(([href, label]) => (
           <Link aria-current={isActive(href) ? "page" : undefined} className={`nav-link${isActive(href) ? " active" : ""}`} href={href} key={href}>
             {label}
