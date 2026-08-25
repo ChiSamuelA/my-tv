@@ -1,6 +1,6 @@
 import "server-only";
 
-import { displayCountry, displayLanguage } from "../content/display-names";
+import { displayCategory, displayCountry, displayLanguage } from "../content/display-names";
 import { getCategories, getChannels, getCountries, getLanguages } from "./catalog";
 import type { PaginatedChannels } from "./catalog";
 
@@ -33,14 +33,10 @@ export type LiveSearchParams = Record<string, string | string[] | undefined>;
 
 let facetsPromise: Promise<LiveFacets> | undefined;
 
-function titleCase(value: string): string {
-  return value.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
 async function loadLiveFacets(): Promise<LiveFacets> {
   const [categories, countries, languages] = await Promise.all([getCategories(), getCountries(), getLanguages()]);
   return {
-    categories: categories.map((value) => ({ value, label: titleCase(value) })),
+    categories: categories.map((value) => ({ value, label: displayCategory(value) })),
     countries: countries.map((value) => ({ value, label: displayCountry(value) })).sort((a, b) => a.label.localeCompare(b.label, "en")),
     languages: languages.map((value) => ({ value, label: displayLanguage(value) })).sort((a, b) => a.label.localeCompare(b.label, "en")),
   };

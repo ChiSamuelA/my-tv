@@ -3,7 +3,7 @@ import "server-only";
 import type { Channel } from "../../../../../scripts/data/schema";
 import { getCatalogFiles } from "./loader";
 import { createCatalogStore, type CatalogStore } from "./store";
-import type { CatalogStats, GetChannelsOptions, PaginatedChannels } from "./types";
+import type { CatalogStats, CountryCatalogFacet, GetChannelsOptions, PaginatedChannels } from "./types";
 
 let storePromise: Promise<CatalogStore> | undefined;
 
@@ -38,4 +38,8 @@ export async function getCatalogStats(): Promise<CatalogStats> {
   return (await getStore()).getCatalogStats();
 }
 
-export type { CatalogStats, GetChannelsOptions, PaginatedChannels } from "./types";
+export async function getCountryFacets(): Promise<CountryCatalogFacet[]> {
+  return (await getStore()).getCountryFacets();
+}
+
+export type { CatalogStats, CountryCatalogFacet, GetChannelsOptions, PaginatedChannels } from "./types";

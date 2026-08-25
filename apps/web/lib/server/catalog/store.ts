@@ -5,6 +5,7 @@ import type {
 } from "../../../../../scripts/data/schema";
 import type {
   CatalogStats,
+  CountryCatalogFacet,
   GetChannelsOptions,
   PaginatedChannels,
 } from "./types";
@@ -33,6 +34,7 @@ export interface CatalogStore {
   getCountries(): string[];
   getLanguages(): string[];
   getCatalogStats(): CatalogStats;
+  getCountryFacets(): CountryCatalogFacet[];
 }
 
 export function createCatalogStore(
@@ -50,6 +52,21 @@ export function createCatalogStore(
   const categories = facets((channel) => channel.categories);
   const countries = facets((channel) => channel.country ? [channel.country] : []);
   const languages = facets((channel) => channel.languages);
+  const countryIndex = new Map<string, { channelCount: number; categories: Set<string>; languages: Set<string> }>();
+  for (const channel of channels) {
+    if (!channel.country) continue;
+    const entry = countryIndex.get(channel.country) ?? { channelCount: 0, categories: new Set<string>(), languages: new Set<string>() };
+    entry.channelCount += 1;
+    channel.categories.forEach((category) => entry.categories.add(category));
+    channel.languages.forEach((language) => entry.languages.add(language));
+    countryIndex.set(channel.country, entry);
+  }
+  const countryFacets: CountryCatalogFacet[] = [...countryIndex].map(([code, entry]) => ({
+    code,
+    channelCount: entry.channelCount,
+    categories: [...entry.categories].sort((a, b) => a.localeCompare(b, "en")),
+    languages: [...entry.languages].sort((a, b) => a.localeCompare(b, "en")),
+  })).sort((a, b) => a.code.localeCompare(b.code, "en"));
 
   return {
     getChannelById(id) {
@@ -92,6 +109,7 @@ export function createCatalogStore(
     getCategories: () => categories,
     getCountries: () => countries,
     getLanguages: () => languages,
+    getCountryFacets: () => countryFacets,
     getCatalogStats: () => ({
       schemaVersion: manifest.schemaVersion,
       generatedAt: manifest.generatedAt,

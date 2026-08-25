@@ -146,3 +146,11 @@ test("returns stable empty pagination metadata", () => {
     items: [], page: 1, limit: 10, totalItems: 0, totalPages: 0,
   });
 });
+
+test("builds deterministic country counts and scoped facets", () => {
+  assert.deepEqual(store.getCountryFacets(), [
+    { code: "DE", channelCount: 1, categories: ["sports"], languages: ["deu"] },
+    { code: "FR", channelCount: 3, categories: ["culture", "sports"], languages: ["ara", "fra"] },
+    { code: "US", channelCount: 1, categories: ["news"], languages: ["eng"] },
+  ]);
+});

@@ -32,3 +32,10 @@ export interface CatalogStats {
     | "channelsWithCountry"
   >;
 }
+
+export interface CountryCatalogFacet {
+  code: string;
+  channelCount: number;
+  categories: string[];
+  languages: string[];
+}
