@@ -7,7 +7,7 @@ function sourceDescription(source: WatchSource): string {
 
 export function SourceSelector({ data }: { data: WatchPageData }) {
   if (data.sources.length === 0) return <section className="source-panel"><h2>Sources</h2><p className="single-source-note">No sources available</p></section>;
-  if (data.sources.length === 1) return <section className="source-panel"><h2>Source</h2><p className="single-source-note">1 source available · {sourceDescription(data.sources[0])}</p></section>;
+  if (data.sources.length === 1) return null;
   const route = `/watch/${encodeURIComponent(data.channel.id)}`;
   return (
     <section className="source-panel" aria-labelledby="sources-heading">

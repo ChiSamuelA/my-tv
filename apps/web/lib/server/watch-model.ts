@@ -30,6 +30,14 @@ export interface SelectedPlaybackSource {
   delivery: "direct" | "gateway";
 }
 
+export interface WatchRelatedChannel {
+  id: string;
+  name: string;
+  logo: string | null;
+  country: string;
+  category: string | null;
+}
+
 export interface WatchPageData {
   channel: {
     id: string;
@@ -46,6 +54,7 @@ export interface WatchPageData {
   playbackState: WatchPlaybackState;
   guideAvailable: boolean;
   guideReferenceCount: number;
+  relatedChannels: WatchRelatedChannel[];
 }
 
 export function sourceIdentity(stream: ChannelStream): string {
@@ -125,6 +134,7 @@ export function createWatchPageData(channel: Channel, requestedSource?: string):
     playbackState: playbackState(selectedSource, selectedStream),
     guideAvailable: channel.guides.length > 0,
     guideReferenceCount: channel.guides.length,
+    relatedChannels: [],
   };
 }
 
