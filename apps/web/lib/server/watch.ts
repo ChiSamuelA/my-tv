@@ -13,4 +13,4 @@ export async function getWatchPageData(id: string, params: WatchSearchParams): P
   return createWatchPageData(channel, source);
 }
 
-export type { WatchPageData, WatchSource } from "./watch-model";
+export type { SelectedPlaybackSource, WatchPageData, WatchSource } from "./watch-model";

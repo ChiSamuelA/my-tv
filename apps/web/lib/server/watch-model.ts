@@ -13,6 +13,20 @@ export interface WatchSource {
   isSecure: boolean;
   availability: Array<"geo-blocked" | "not-24-7">;
   feedName: string | null;
+  requiresReferrer: boolean;
+  requiresUserAgent: boolean;
+}
+
+export type PlaybackKind = "hls" | "direct" | "dash" | "unsupported";
+
+export interface SelectedPlaybackSource {
+  id: string;
+  url: string;
+  kind: PlaybackKind;
+  protocol: string;
+  isSecure: boolean;
+  requiresReferrer: boolean;
+  requiresUserAgent: boolean;
 }
 
 export interface WatchPageData {
@@ -27,6 +41,7 @@ export interface WatchPageData {
   };
   sources: WatchSource[];
   selectedSource: WatchSource | null;
+  selectedPlayback: SelectedPlaybackSource | null;
   playbackState: WatchPlaybackState;
   guideAvailable: boolean;
   guideReferenceCount: number;
@@ -47,9 +62,22 @@ function deriveFormat(stream: ChannelStream): string | null {
   return null;
 }
 
-function playbackState(source: WatchSource | null): WatchPlaybackState {
+export function classifyPlayback(stream: ChannelStream): PlaybackKind {
+  const protocol = stream.protocol.toLowerCase();
+  if (!["http", "https"].includes(protocol)) return "unsupported";
+  try {
+    const pathname = new URL(stream.url).pathname.toLowerCase();
+    if (pathname.endsWith(".m3u8")) return "hls";
+    if (pathname.endsWith(".mpd")) return "dash";
+    if ([".mp4", ".webm", ".ogv", ".ogg", ".mov", ".m4v"].some((extension) => pathname.endsWith(extension))) return "direct";
+  } catch { return "unsupported"; }
+  return "direct";
+}
+
+function playbackState(source: WatchSource | null, stream: ChannelStream | null): WatchPlaybackState {
   if (!source) return "unavailable";
   if (!["http", "https"].includes(source.protocol.toLowerCase())) return "unsupported";
+  if (stream && ["dash", "unsupported"].includes(classifyPlayback(stream))) return "unsupported";
   if (!source.isSecure) return "insecure-source";
   return "ready";
 }
@@ -65,8 +93,12 @@ export function createWatchPageData(channel: Channel, requestedSource?: string):
     isSecure: stream.isHttps,
     availability: [...stream.availability],
     feedName: stream.feed ? feeds.get(stream.feed)?.name ?? null : null,
+    requiresReferrer: Boolean(stream.referrer),
+    requiresUserAgent: Boolean(stream.userAgent),
   }));
-  const selectedSource = sources.find((source) => source.id === requestedSource) ?? sources[0] ?? null;
+  const selectedIndex = Math.max(0, sources.findIndex((source) => source.id === requestedSource));
+  const selectedSource = sources[selectedIndex] ?? null;
+  const selectedStream = channel.streams[selectedIndex] ?? null;
   return {
     channel: {
       id: channel.id,
@@ -79,7 +111,16 @@ export function createWatchPageData(channel: Channel, requestedSource?: string):
     },
     sources,
     selectedSource,
-    playbackState: playbackState(selectedSource),
+    selectedPlayback: selectedSource && selectedStream ? {
+      id: selectedSource.id,
+      url: selectedStream.url,
+      kind: classifyPlayback(selectedStream),
+      protocol: selectedSource.protocol,
+      isSecure: selectedSource.isSecure,
+      requiresReferrer: selectedSource.requiresReferrer,
+      requiresUserAgent: selectedSource.requiresUserAgent,
+    } : null,
+    playbackState: playbackState(selectedSource, selectedStream),
     guideAvailable: channel.guides.length > 0,
     guideReferenceCount: channel.guides.length,
   };

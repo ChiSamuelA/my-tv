@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { Channel, ChannelStream } from "../../../../scripts/data/schema";
-import { createWatchPageData, resolveWatchChannelId, sourceIdentity } from "./watch-model";
+import { classifyPlayback, createWatchPageData, resolveWatchChannelId, sourceIdentity } from "./watch-model";
 
 function stream(url: string, protocol: string, isHttps: boolean): ChannelStream {
   return { url, feed: "SD", quality: "720p", availability: [], referrer: null, userAgent: null, protocol, isHttps, provenance: { adapter: "local-iptv-checkout", file: "fixture.m3u", line: 1, upstreamChannelId: null, publishedMatch: null } };
@@ -39,4 +39,13 @@ test("detects HTTPS, HTTP, HLS, unsupported, single-source, and zero-source stat
   assert.equal(createWatchPageData(channel([stream("http://example.test/live.m3u8", "http", false)])).playbackState, "insecure-source");
   assert.equal(createWatchPageData(channel([stream("rtmp://example.test/live", "rtmp", false)])).playbackState, "unsupported");
   assert.equal(createWatchPageData(channel([])).playbackState, "unavailable");
+});
+
+test("classifies HLS, DASH, direct media, unknown HTTP, RTMP, and RTSP sources", () => {
+  assert.equal(classifyPlayback(stream("https://example.test/live.m3u8", "https", true)), "hls");
+  assert.equal(classifyPlayback(stream("https://example.test/live.mpd", "https", true)), "dash");
+  assert.equal(classifyPlayback(stream("https://example.test/video.mp4", "https", true)), "direct");
+  assert.equal(classifyPlayback(stream("https://example.test/live", "https", true)), "direct");
+  assert.equal(classifyPlayback(stream("rtmp://example.test/live", "rtmp", false)), "unsupported");
+  assert.equal(classifyPlayback(stream("rtsp://example.test/live", "rtsp", false)), "unsupported");
 });
