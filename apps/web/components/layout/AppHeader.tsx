@@ -28,7 +28,7 @@ export function AppHeader() {
           </Link>
         ))}
       </nav>
-      <Link className="header-search" href="/search" aria-label="Search channels">
+      <Link aria-current={pathname.startsWith("/search") ? "page" : undefined} className={`header-search${pathname.startsWith("/search") ? " active" : ""}`} href="/search" aria-label="Search channels">
         <SearchIcon /><span>Search</span>
       </Link>
     </header>
