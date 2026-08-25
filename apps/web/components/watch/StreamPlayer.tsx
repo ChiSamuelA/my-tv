@@ -48,6 +48,15 @@ export function StreamPlayer({ channelName, source }: StreamPlayerProps) {
       const hls = new HlsPlayer({ enableWorker: true });
       hlsRef.current = hls;
       hls.on(HlsPlayer.Events.ERROR, (_event, data) => {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Playback diagnostic", {
+            type: data.type,
+            details: data.details,
+            fatal: data.fatal,
+            status: data.response?.code ?? null,
+            delivery: source.delivery,
+          });
+        }
         if (!data.fatal || cancelled) return;
         if (data.type === HlsPlayer.ErrorTypes.NETWORK_ERROR && networkRecoveries < 1) {
           networkRecoveries += 1;
@@ -84,13 +93,18 @@ export function StreamPlayer({ channelName, source }: StreamPlayerProps) {
     setAttempt((value) => value + 1);
   };
 
+  const handleNativeError = () => {
+    if (process.env.NODE_ENV === "development") console.warn("Native media diagnostic", { code: videoRef.current?.error?.code ?? null, delivery: source.delivery });
+    setRuntimeState("error");
+  };
+
   return (
     <div className="stream-player">
       <video
         aria-label={`${channelName} playback`}
         controls
         onCanPlay={() => setRuntimeState("ready")}
-        onError={() => setRuntimeState("error")}
+        onError={handleNativeError}
         onLoadStart={() => setRuntimeState("loading")}
         onPlaying={() => setRuntimeState("playing")}
         playsInline

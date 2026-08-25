@@ -27,6 +27,7 @@ export interface SelectedPlaybackSource {
   isSecure: boolean;
   requiresReferrer: boolean;
   requiresUserAgent: boolean;
+  delivery: "direct" | "gateway";
 }
 
 export interface WatchPageData {
@@ -119,6 +120,7 @@ export function createWatchPageData(channel: Channel, requestedSource?: string):
       isSecure: selectedSource.isSecure,
       requiresReferrer: selectedSource.requiresReferrer,
       requiresUserAgent: selectedSource.requiresUserAgent,
+      delivery: "direct",
     } : null,
     playbackState: playbackState(selectedSource, selectedStream),
     guideAvailable: channel.guides.length > 0,

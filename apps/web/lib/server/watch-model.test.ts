@@ -26,6 +26,7 @@ test("builds stable sources in catalog order and validates selection", () => {
   const initial = createWatchPageData(channel([first, second]));
   assert.equal(initial.sources.length, 2);
   assert.equal(initial.selectedSource?.id, sourceIdentity(first));
+  assert.equal(initial.selectedPlayback?.delivery, "direct");
   assert.equal(initial.sources[1]?.id, sourceIdentity(second));
   assert.equal(createWatchPageData(channel([first, second]), "invalid").selectedSource?.id, sourceIdentity(first));
   assert.equal(createWatchPageData(channel([first, second]), sourceIdentity(second)).selectedSource?.id, sourceIdentity(second));
