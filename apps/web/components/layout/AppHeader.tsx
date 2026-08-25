@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function SearchIcon() {
   return (
@@ -9,15 +12,21 @@ function SearchIcon() {
   );
 }
 
+const navigation = [["/", "Home"], ["/sports", "Sports"], ["/live", "Live TV"], ["/countries", "Countries"]] as const;
+
 export function AppHeader() {
+  const pathname = usePathname();
+  const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
     <header className="app-header">
-      <Link className="wordmark" href="/">my<span>·</span>tv</Link>
+      <Link className="wordmark" href="/">my<span>{"\u00b7"}</span>tv</Link>
       <nav className="desktop-nav" aria-label="Primary navigation">
-        <Link aria-current="page" className="nav-link active" href="/">Home</Link>
-        <Link className="nav-link" href="/sports">Sports</Link>
-        <Link className="nav-link" href="/live">Live TV</Link>
-        <Link className="nav-link" href="/countries">Countries</Link>
+        {navigation.map(([href, label]) => (
+          <Link aria-current={isActive(href) ? "page" : undefined} className={`nav-link${isActive(href) ? " active" : ""}`} href={href} key={href}>
+            {label}
+          </Link>
+        ))}
       </nav>
       <Link className="header-search" href="/search" aria-label="Search channels">
         <SearchIcon /><span>Search</span>
